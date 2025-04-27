@@ -11,8 +11,8 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Load models
-image_model = load_model(os.path.join(BASE_DIR, 'models', 'asd_image_model.keras'))
-audio_model = load_model(os.path.join(BASE_DIR, 'models', 'asd_audio_model.keras'))
+image_model = load_model(os.path.join(BASE_DIR, 'model', 'asd_image_model.keras'))
+audio_model = load_model(os.path.join(BASE_DIR, 'model', 'asd_audio_model.keras'))
 
 # Home page
 @app.route('/')
