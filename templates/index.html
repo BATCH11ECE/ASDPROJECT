@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Autism Detection Application</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(to right, #667eea, #764ba2); color: #fff; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+    header { text-align: center; padding: 20px; font-size: 2rem; font-weight: bold; }
+    main { flex: 1; display: flex; flex-direction: row; justify-content: center; align-items: flex-start; padding: 20px; gap: 20px; flex-wrap: wrap; }
+    .left-panel, .right-panel { background: rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 25px; box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); width: 100%; max-width: 450px; }
+    .left-panel h2, .right-panel h2 { margin-bottom: 10px; font-size: 1.3rem; }
+    input[type="file"], input[type="text"], button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 10px; border: none; font-size: 1rem; }
+    button { background: #ff6b6b; color: white; cursor: pointer; transition: 0.3s; }
+    button:hover { background: #ff4757; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 71, 87, 0.6); }
+    #result { font-size: 1.1rem; text-align: center; margin-top: 10px; }
+    footer { text-align: center; padding: 15px 0; background: rgba(255, 255, 255, 0.05); font-size: 0.9rem; color: #e0e0e0; }
+    img { max-width: 300px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); margin-top: 15px; }
+    .upload-section { display: flex; gap: 10px; margin-bottom: 15px; }
+    .upload-btn { flex: 1; background: linear-gradient(to right, #36d1dc, #5b86e5); border-radius: 12px; padding: 12px; text-align: center; font-size: 16px; font-weight: 600; color: #fff; cursor: pointer; transition: 0.3s; }
+    .upload-btn:hover { background: linear-gradient(to right, #5b86e5, #36d1dc); transform: translateY(-2px); }
+    .upload-btn input { display: none; }
+    .message { font-size: 0.9rem; color: #d4ffea; margin-top: -10px; margin-bottom: 10px; text-align: center; }
+    @media (max-width: 768px) { main { flex-direction: column; align-items: center; } .left-panel, .right-panel { max-width: 90%; } }
+  </style>
+</head>
+
+<body>
+
+  <header>AUTISM DETECTION APPLICATION</header>
+
+  <main>
+    <div class="left-panel">
+      <h2>Patient Name :</h2>
+      <input type="text" id="nameInput" placeholder="Enter Name">
+
+      <h2>Patient Age :</h2>
+      <input type="text" id="ageInput" placeholder="Enter Age">
+
+      <h2>Upload or Capture Image:</h2>
+      <div class="upload-section">
+        <label class="upload-btn" title="Upload Image 📂">
+          📂 Upload
+          <input type="file" id="uploadImage" accept="image/*" onchange="handleImageUpload(this)">
+        </label>
+        <label class="upload-btn" title="Capture Image 📷">
+          📷 Camera
+          <input type="file" accept="image/*" capture="environment" onchange="handleImageUpload(this)">
+        </label>
+      </div>
+      <div id="imageMessage" class="message"></div>
+
+      <h2>Upload or Record Audio:</h2>
+      <div class="upload-section">
+        <label class="upload-btn" title="Upload Audio 🎵">
+          🎵 Upload
+          <input type="file" id="uploadAudio" accept="audio/*" onchange="handleAudioUpload(this)">
+        </label>
+        <label class="upload-btn" title="Record Audio 🎙️">
+          🎙️ Record
+          <input type="file" accept="audio/*" capture="microphone" onchange="handleAudioUpload(this)">
+        </label>
+      </div>
+      <div id="audioMessage" class="message"></div>
+
+      <button onclick="predict()">Predict</button>
+    </div>
+
+    <div class="right-panel">
+      <h2>Prediction Result</h2>
+      <div id="result">Waiting for prediction...</div>
+    </div>
+  </main>
+
+  <footer>© BALASURYA G | Developed by BALASURYA G</footer>
+
+  <script>
+    let uploadedImageFile = null;
+    let uploadedAudioFile = null;
+    let imageURL = "";
+
+    function handleImageUpload(input) {
+      if (input.files && input.files[0]) {
+        uploadedImageFile = input.files[0];
+        imageURL = URL.createObjectURL(uploadedImageFile);
+        document.getElementById('imageMessage').innerText = "📷 Image uploaded successfully!";
+        showUploadedFiles();
+      }
+    }
+
+    function handleAudioUpload(input) {
+      if (input.files && input.files[0]) {
+        uploadedAudioFile = input.files[0];
+        document.getElementById('audioMessage').innerText = "🎙️ Audio uploaded successfully!";
+      }
+    }
+
+    function showUploadedFiles() {
+      if (uploadedImageFile) {
+        document.getElementById('result').innerHTML = `
+          <img src="${imageURL}" alt="Uploaded Image">
+          <div style="margin-top:15px;">✅ Image Uploaded. Ready to Predict.</div>
+        `;
+      }
+    }
+
+    async function predict() {
+      const name = document.getElementById('nameInput').value;
+      const age = document.getElementById('ageInput').value;
+
+      if (!name || !age || !uploadedImageFile || !uploadedAudioFile) {
+        document.getElementById('result').innerText = "⚠️ Please provide all required data!";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('age', age);
+      formData.append('image', uploadedImageFile);
+      formData.append('audio', uploadedAudioFile);
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        document.getElementById('result').innerHTML = `
+          <img src="${imageURL}" alt="Uploaded Image">
+          <div style="margin-top:15px;">✅ Prediction: ${data.prediction}</div>
+        `;
+      } catch (error) {
+        document.getElementById('result').innerText = "❌ Prediction failed. Please try again!";
+        console.error('Error:', error);
+      }
+    }
+  </script>
+
+</body>
+</html>
