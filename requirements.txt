@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 flask
 tensorflow
 librosa
@@ -5,3 +6,12 @@ pillow
 matplotlib
 numpy
 gunicorn
+=======
+flask
+tensorflow
+librosa
+pillow
+matplotlib
+numpy
+gunicorn
+>>>>>>> df1934cc63d0ca2f1ce4279f85d44802ad308260
