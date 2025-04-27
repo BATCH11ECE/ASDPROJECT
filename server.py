@@ -7,8 +7,8 @@ import librosa
 app = Flask(__name__)
 
 # Load your models
-image_model = load_model('asd_image_model.keras')  # Make sure the file name matches
-audio_model = load_model('asd_audio_model.keras')  # Make sure the file name matches
+image_model = load_model('models/asd_image_model.keras')  # Make sure the file name matches
+audio_model = load_model('models/asd_audio_model.keras')  # Make sure the file name matches
 
 @app.route('/')
 def home():
